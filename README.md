@@ -5,4 +5,4 @@ Download this source code along with the arsd library which can be found here: h
 
 Then just compile it using the DMD compiler and the command "dmd sierpinskigasket -m64 -i -J. -O".
 
-Watch the magic happen on the screen.
+Run it and watch the magic happen on the screen.
