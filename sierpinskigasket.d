@@ -4,25 +4,6 @@ import arsd.simpledisplay : Color, Point, ScreenPainter, SimpleWindow;
 import core.thread : Fiber, Thread;
 import core.time : msecs;
 
-void main()
-{
-    // create the window for the GUI
-    SimpleWindow programWindow = new SimpleWindow(800, 800, "Sierpinski Gasket");
-    // clear the GUI, it's in a scope so the GUI gets flushed right away
-    {programWindow.draw().clear(Color.black());}
-    // create the fiber and call the recursive function which draws the gasket
-    Fiber fiber = new Fiber({sierpinskiGasket(0, 0, 800, 800, programWindow);});
-
-    // start the event loop
-    programWindow.eventLoop(5,
-    {
-        // if the fiber hasn't finished yet
-        if (fiber.state != fiber.state.TERM)
-            // call the fiber again, to resume the work
-            fiber.call();
-    });
-}
-
 // this is the recursive function, it slices the father square into 4 child squares and calls itself on the child squares, except the lower left one
 void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow window)
 {
@@ -70,4 +51,23 @@ void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow win
         // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
     }
+}
+
+void main()
+{
+    // create the window for the GUI
+    SimpleWindow programWindow = new SimpleWindow(800, 800, "Sierpinski Gasket");
+    // clear the GUI, it's in a scope so the GUI gets flushed right away
+    {programWindow.draw().clear(Color.black());}
+    // create the fiber and call the recursive function which draws the gasket
+    Fiber fiber = new Fiber({sierpinskiGasket(0, 0, 800, 800, programWindow);});
+
+    // start the event loop
+    programWindow.eventLoop(5,
+    {
+        // if the fiber hasn't finished yet
+        if (fiber.state != fiber.state.TERM)
+            // call the fiber again, to resume the work
+            fiber.call();
+    });
 }
