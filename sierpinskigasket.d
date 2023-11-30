@@ -1,51 +1,73 @@
+// This software draws a Sierpinski gasket recursively using the fiber feature of Dlang.
+
 import arsd.simpledisplay : Color, Point, ScreenPainter, SimpleWindow;
 import core.thread : Fiber, Thread;
 import core.time : msecs;
 
 void main()
 {
-    // we start with a 800x800 pixels window and paint it black
+    // create the window for the GUI
     SimpleWindow programWindow = new SimpleWindow(800, 800, "Sierpinski Gasket");
-    programWindow.draw().clear(Color.black());
-    // start things in the fiber instead of a thread
+    // clear the GUI, it's in a scope so the GUI gets flushed right away
+    {programWindow.draw().clear(Color.black());}
+    // create the fiber and call the recursive function which draws the gasket
     Fiber fiber = new Fiber({sierpinskiGasket(0, 0, 800, 800, programWindow);});
-    // we let this event loop run lazily, the recursive function will do all the drawing
+
+    // start the event loop
     programWindow.eventLoop(5,
     {
-        // and on the timer you just call it, which picks up where it last yielded
+        // if the fiber hasn't finished yet
         if (fiber.state != fiber.state.TERM)
+            // call the fiber again, to resume the work
             fiber.call();
     });
 }
 
-// this is the recursive routine, it slices the square in 4 sub squares and calls itself on the subsquares, except the lower left one
+// this is the recursive function, it slices the father square into 4 child squares and calls itself on the child squares, except the lower left one
 void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow window)
 {
+    // stop the fiber and wait until it is called again
     Fiber.yield();
-    // this is the base case, when the square is 5 pixels or less in width then it just fills it with color and no further recursive calls are made
+
+    // if the square is smaller than or equal to 5 pixels
     if (right - left <= 5 || bottom - top <= 5)
     {
+        // create the painter
         ScreenPainter painter = window.draw();
+        // get the color blue for the outline and the fill
         painter.outlineColor = Color.blue(), painter.fillColor = Color.blue();
+        // just fill the square, this is the base case
         painter.drawRectangle(Point(left, top), right - left, bottom - top);
     }
+    // if the square is bigger than 5 pixels
     else
     {
-        // we find the middle points in order to divide the square in 4 pieces
+        // find the midpoints in order to divide the square into 4 pieces
         int widthMiddle = (right - left) / 2, heightMiddle = (bottom - top) / 2;
-        // we draw the one horizontal line and one vertical line, notice it is inside a scope because that is the only way the GUI gets flushed right away
+
+        // draw the lines to divide it, notice it's inside a scope so that the GUI gets flushed right away
         {
+            // create the painter
             ScreenPainter painter = window.draw();
+            // get the blue color
             painter.outlineColor = Color.blue();
-            painter.drawLine(Point(left, top + heightMiddle), Point(right, top + heightMiddle)), painter.drawLine(Point(left + widthMiddle, top), Point(left + widthMiddle, bottom));
+            // draw the horizontal line
+            painter.drawLine(Point(left, top + heightMiddle), Point(right, top + heightMiddle));
+            // draw the vertical line
+            painter.drawLine(Point(left + widthMiddle, top), Point(left + widthMiddle, bottom));
         }
-        // we calculate the positions of the sides of the each of the next 3 subsquares
+
+        // calculate the coordinates of the sides of the 1st child square
         int nextLeft = left, nextTop = top, nextRight = left + widthMiddle, nextBottom = top + heightMiddle;
-        // then we call the function on each of them
+        // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
+        // calculate the coordinates of the sides of the 2nd child square
         nextLeft = left + widthMiddle, nextTop = top, nextRight = right, nextBottom = top + heightMiddle;
+        // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
+        // calculate the coordinates of the sides of the 3rd child square
         nextLeft = left + widthMiddle, nextTop = top + heightMiddle, nextRight = right, nextBottom = bottom;
+        // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
     }
 }
