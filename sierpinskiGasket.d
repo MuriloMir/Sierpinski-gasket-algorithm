@@ -1,8 +1,7 @@
 // This software draws a Sierpinski gasket recursively using the fiber feature of Dlang.
 
 import arsd.simpledisplay : Color, Point, ScreenPainter, SimpleWindow;
-import core.thread : Fiber, Thread;
-import core.time : msecs;
+import core.thread : Fiber;
 
 // this is the recursive function, it slices the father square into 4 child squares and calls itself on the child squares, except the lower left one
 void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow window)
@@ -15,6 +14,7 @@ void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow win
     {
         // create the painter
         ScreenPainter painter = window.draw();
+
         // get the color blue for the outline and the fill
         painter.outlineColor = Color.blue(), painter.fillColor = Color.blue();
         // just fill the square, this is the base case
@@ -30,6 +30,7 @@ void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow win
         {
             // create the painter
             ScreenPainter painter = window.draw();
+
             // get the blue color
             painter.outlineColor = Color.blue();
             // draw the horizontal line
@@ -40,14 +41,19 @@ void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow win
 
         // calculate the coordinates of the sides of the 1st child square
         int nextLeft = left, nextTop = top, nextRight = left + widthMiddle, nextBottom = top + heightMiddle;
+
         // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
+
         // calculate the coordinates of the sides of the 2nd child square
         nextLeft = left + widthMiddle, nextTop = top, nextRight = right, nextBottom = top + heightMiddle;
+
         // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
+
         // calculate the coordinates of the sides of the 3rd child square
         nextLeft = left + widthMiddle, nextTop = top + heightMiddle, nextRight = right, nextBottom = bottom;
+
         // call the function on it, recursively
         sierpinskiGasket(nextLeft, nextTop, nextRight, nextBottom, window);
     }
@@ -57,8 +63,10 @@ void main()
 {
     // create the window for the GUI
     SimpleWindow programWindow = new SimpleWindow(800, 800, "Sierpinski Gasket");
+
     // clear the GUI, it's in a scope so the GUI gets flushed right away
     {programWindow.draw().clear(Color.black());}
+
     // create the fiber and call the recursive function which draws the gasket
     Fiber fiber = new Fiber({sierpinskiGasket(0, 0, 800, 800, programWindow);});
 
