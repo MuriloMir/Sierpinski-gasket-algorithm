@@ -59,6 +59,7 @@ void sierpinskiGasket(int left, int top, int right, int bottom, SimpleWindow win
     }
 }
 
+// start the software
 void main()
 {
     // create the window for the GUI
