@@ -1,7 +1,7 @@
 // This software draws a Sierpinski gasket recursively using the fiber feature of Dlang.
 
 // import all the tools we need
-import arsd.simpledisplay : Color, Point, ScreenPainter, SimpleWindow;
+import multimedia.display : Color, Point, ScreenPainter, SimpleWindow;
 import core.thread : Fiber;
 
 // this is the recursive function, it slices the father square into 4 child squares and calls itself on the child squares, except the lower left one
